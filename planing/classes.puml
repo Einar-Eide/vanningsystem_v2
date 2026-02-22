@@ -1,0 +1,115 @@
+@startuml
+
+'enum
+enum Sensor_Type {
+    HUMIDITY
+    THERMOMETER
+    LOAD_CELL
+    PHOTO_DIODE
+}
+
+
+'struct
+struct Pump_Config {
+    +interval : unit64_t
+    +duration : unit32_t
+    +startup_delay : uint32_t
+}
+
+'class
+class Pump {
+    -String name
+    -int CONTROLL_PIN
+    -Pump_Config cfg
+
+    +Pump()
+
+    -{static?} read_timer_callback() : void
+    +start_timer(uint64_t interval) : void
+    +stop_timer() : void
+    +delete_timer() : void
+
+    +update_config() : void
+
+}
+
+class Pump_Manager
+
+abstract class Sensor {
+    -String name
+    -Sensor_Type type
+
+    -int newest_raw_value
+    
+    -int INPUT_PIN
+    -int min_value
+    -int max_value
+    -int read_interval
+
+    +Sensor(name, type, pin_in, min, max, interval)
+
+    -{static?} read_timer_callback() : void
+    +start_timer(uint64_t interval) : void
+    +stop_timer() : void
+    +delete_timer() : void
+
+    +read_raw() : int
+    +{abstract} read() : float
+
+    +get_name() : String
+    +get_type() : Sensor_Type
+    +get_pin() : int
+    +get_read_interval() : int
+}
+
+class Sensor_Manager {
+    -map<Sensor_Type, map<string, *Sensor>> sensors
+    
+    +add_sensor(name, type, pin_in, min, max, interval) : void
+    +remove_sensor(name: string) : void
+    +remove_sensor(type: Sensor_Type) : void
+
+    +sensor_count() : int
+    +sensor_count_of_type(type: Sensor_Type): int
+
+    +read_raw(data : &map<string, int>) : void
+    +read(data : &map<string, int>) : void
+}
+
+class Humidity_Sensor {
+    +read() : float
+}
+
+class Thermometer {
+    +read() : float
+}
+
+class Load_Cell {
+    +read() : float
+}
+
+class Photo_Diode {
+    +read() : float
+}
+
+class Netwok_Bridge {
+    +push_data_point_to_influxDB() : bool
+    +get_pump_config(cfg : &Pump_Config, name : string) : void
+    +get_sensor_timer_duration(type : Sensor_Type) : unit64_t
+}
+
+'relations
+
+'pump
+Pump_Manager "1  " *-- "1..*" Pump
+Netwok_Bridge <. Pump
+
+'sensor
+Sensor_Manager "1  " *-- "1..*" Sensor
+Sensor <|-- Humidity_Sensor
+Sensor <|-- Thermometer
+Sensor <|-- Load_Cell
+Sensor <|-- Photo_Diode
+Sensor .> Netwok_Bridge
+
+@enduml

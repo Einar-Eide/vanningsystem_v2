@@ -1,0 +1,61 @@
+#VANNINGSSYSTEM v2
+
+
+## Vanning
+Vanner alle plantene nedenfra (kanskje uten om Hilde?)
+Deler plantene i grupper utifra hvor ofte de trenger å vannes
+* Eddie, (Ludvig) og Tom (Trenger egen løsning)
+
+Putter gruppene i vær sin balje
+- Disse fulles opp med vann fra en pumpe plasert i et baseng (med lokk!!)
+- Når de er ferdig vannet (10-20 minutter) åpnes en ventil og vannet renner ut i basenget igjen.
+- Baljen må stå med litt helning mot ventilen (~1 grad).
+
+Lager 3(?) kopier av dette systemet, et for hver gruppe
+
+(Eventuelt reguleringssystem for Eddie)
+
+
+## Sensor
+
+### Kamera
+Bilde av plantene under vanning og med jevne mellomrom (1 gang i timen).
+* trenger kanskje et 3d-printet stativ
+
+
+### fuktighetsesnor 
+fuktighetsensor i de største plantene, og i hvert fal en i hver gruppe
+
+
+### termometer
+Koble termometer på alle mikrokontrollere, eller flere på samme
+* Noen i sol og i skygge
+* Kanskje i vannbasseng (?)
+
+
+### Vekt (?)
+
+
+### photodiode for å lese fargen på jorden på overflaten
+
+
+
+### Vannmåler til Eddie (?)
+Måle vannhøyde
+
+
+## Nettside?
+Mulighet for å endre intervall, mengde og lengde på vanning gjennom admin side på nettsiden
+Vise data fra alle sensorer
+Vise nyeste bilde + mapper med eldre bilder
+
+
+## Utstyrsliste
+
+
+
+## andre greier
+
+
+
+
