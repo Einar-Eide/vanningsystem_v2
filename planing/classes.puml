@@ -31,8 +31,12 @@ class Pump {
     +delete_timer() : void
 
     +update_config() : void
+}
+
+class Pump_Manager {
 
 }
+
 
 abstract class Sensor {
     -String name
@@ -93,16 +97,16 @@ class Photo_Diode {
 
 'her har jeg lite kontroll på hvordan dette faktisk kommer til å fingere 
 class MQTT_Handler {
-    
-    +MQTT_receive()
-    +MQTT_publish()
+    -forward(manager : Pump_Manager&) ???
+    +publish()
 }
 
 
 'relations
 
 'Pump
-MQTT_Handler <. Pump
+Pump_Manager *- Pump
+MQTT_Handler .> Pump_Manager
 
 'Sensor
 Sensor_Manager "1  " *-- "1..*" Sensor
