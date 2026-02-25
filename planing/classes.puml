@@ -9,7 +9,7 @@ enum Sensor_Type {
 }
 
 
-'struct
+'struct (this one might be removed)
 struct Pump_Config {
     +interval : unit64_t
     +duration : unit32_t
@@ -24,7 +24,8 @@ class Pump {
 
     +Pump()
 
-    -{static?} read_timer_callback() : void
+    -{static?} water_interval_timer_callback() : void
+    -{static?} water_interval_timer_callback() : void
     +start_timer(uint64_t interval) : void
     +stop_timer() : void
     +delete_timer() : void
@@ -32,8 +33,6 @@ class Pump {
     +update_config() : void
 
 }
-
-class Pump_Manager
 
 abstract class Sensor {
     -String name
@@ -92,24 +91,25 @@ class Photo_Diode {
     +read() : float
 }
 
-class Netwok_Bridge {
-    +push_data_point_to_influxDB() : bool
-    +get_pump_config(cfg : &Pump_Config, name : string) : void
-    +get_sensor_timer_duration(type : Sensor_Type) : unit64_t
+'her har jeg lite kontroll på hvordan dette faktisk kommer til å fingere 
+class MQTT_Handler {
+    
+    +MQTT_receive()
+    +MQTT_publish()
 }
+
 
 'relations
 
-'pump
-Pump_Manager "1  " *-- "1..*" Pump
-Netwok_Bridge <. Pump
+'Pump
+MQTT_Handler <. Pump
 
-'sensor
+'Sensor
 Sensor_Manager "1  " *-- "1..*" Sensor
 Sensor <|-- Humidity_Sensor
 Sensor <|-- Thermometer
 Sensor <|-- Load_Cell
 Sensor <|-- Photo_Diode
-Sensor .> Netwok_Bridge
+Sensor .> MQTT_Handler
 
 @enduml
