@@ -12,18 +12,6 @@ void MQTT_Handler::update() {
         reconnect();
     }
     client.loop();
-
-    // Publish every 5 seconds
-    unsigned long now = millis();
-    if (now - lastMsg > 10000) {
-        lastMsg = now;
-
-        String message = "Hello from ESP32, count=";
-        message += counter++;
-
-        client.publish(mqtt_topic, message.c_str());
-        Serial.println("Message published: " + message);
-    }
 }
 
 // ====== MQTT Reconnect ======
@@ -41,7 +29,8 @@ void MQTT_Handler::reconnect() {
       client.subscribe(mqtt_topic);
 
       // Publish initial message
-      client.publish(mqtt_topic, "ESP32 connected!");
+      String topic = String(mqtt_topic) + "/connection";
+      client.publish(topic.c_str(), "ESP32 connected!");
     } else {
       Serial.print("failed, rc=");
       Serial.print(client.state());
@@ -49,6 +38,12 @@ void MQTT_Handler::reconnect() {
       delay(5000);
     }
   }
+}
+
+void MQTT_Handler::publish(String sufix_topic, String message) {
+  String topic = mqtt_topic + sufix_topic;
+  client.publish(topic.c_str(), message.c_str());
+  Serial.println("published: " + message + "\t to topic: " + topic);
 }
 
 

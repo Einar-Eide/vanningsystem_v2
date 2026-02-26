@@ -23,6 +23,8 @@ public:
     void update();
     void reconnect();
 
+    void publish(String topic, String message);
+
     friend void mqtt_callback(char* topic, byte* payload, unsigned int length);
 };
 

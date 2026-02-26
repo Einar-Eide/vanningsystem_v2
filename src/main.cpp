@@ -12,6 +12,7 @@ const char* password = WIFI_PASSWORD;
 
 WiFiClient espClient;
 MQTT_Handler mqtt_client(espClient);
+MQTT_Handler* p_mqtt_client = &mqtt_client;
 
 
 // ====== Sensors ======
@@ -47,12 +48,16 @@ void setup_wifi() {
 void setup() {
   Serial.begin(115200);
   setup_wifi();
+  p_mqtt_client->reconnect();
+
+  h1.init(p_mqtt_client);
   h1.start_timer(5);
 }
 
 void loop() {
   mqtt_client.update();
 
-  Serial.println( h1.read_raw() );
+  h1.update();
+  delay(100);
 }
 
