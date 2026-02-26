@@ -4,7 +4,7 @@
 
 #include ".secrets.h"
 #include "MQTT_Handler.h"
-#include "Sensor.h"
+#include "humidity_sensor.h"
 
 // ====== WIFI SETTINGS ======
 const char* ssid = WIFI_SSID;
@@ -12,6 +12,11 @@ const char* password = WIFI_PASSWORD;
 
 WiFiClient espClient;
 MQTT_Handler mqtt_client(espClient);
+
+
+// ====== Sensors ======
+Humidity_Sensor h1("test", Sensor_Type::HUMIDITY_SENSOR, 32);
+
 
 // ====== WiFi Connect ======
 void setup_wifi() {
@@ -42,9 +47,12 @@ void setup_wifi() {
 void setup() {
   Serial.begin(115200);
   setup_wifi();
+  h1.start_timer(5);
 }
 
 void loop() {
   mqtt_client.update();
+
+  Serial.println( h1.read_raw() );
 }
 
