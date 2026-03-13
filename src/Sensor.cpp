@@ -1,5 +1,10 @@
 #include "Sensor.h"
 
+Sensor::Sensor(Cfg_Sensor cfg) : 
+    name(cfg.name), type(cfg.type), INPUT_PIN(cfg.pin_in), // basics
+    uses_mux_adress(cfg.uses_mux_adress), mux_adress(cfg.mux_adress), mux_adress_pins(cfg.mux_adress_pins), // mux adressing
+    min_value(cfg.min), max_value(cfg.max) {} // min max values
+
 Sensor::Sensor(String name, Sensor_Type type, uint8_t pin_in, uint16_t min, uint16_t max) : 
     name(name), type(type), INPUT_PIN(pin_in), min_value(min), max_value(max) {}
 
@@ -30,6 +35,12 @@ void Sensor::init(MQTT_Handler* p_mqtt_handler) {
     ESP_ERROR_CHECK(esp_timer_create(&timer_args, &timer_handle));
 
     Serial.println(name + " timer started!");
+}
+
+void Sensor::set_mux_adress_pins() {
+    for (int i=0; i<mux_adress_pins.size(); i++) {
+        digitalWrite(mux_adress_pins.at(i), mux_adress & (1 << i));
+    }
 }
 
 
