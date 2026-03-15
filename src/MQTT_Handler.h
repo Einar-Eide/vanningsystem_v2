@@ -24,6 +24,8 @@ public:
     void reconnect();
 
     void publish(String topic, String message);
+    
+    void add_subscribtion(String topic); // TODO
 
     friend void mqtt_callback(char* topic, byte* payload, unsigned int length);
 };

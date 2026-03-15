@@ -10,22 +10,32 @@ enum Sensor_Type {
 
 
 'struct (this one might be removed)
-struct Pump_Config {
-    +interval : unit64_t
-    +duration : unit32_t
+struct Cfg_Pump {
+    +interval : uint64_t
+    +duration : uint32_t
     +startup_delay : uint32_t
+}
+
+struct Cfg_Senosr {
+    +name : String 
+    +type: Sensor_Type
+    +pin_in : uint8_t
+    +uses_mux_adress : bool
+    +mux_adress : uint8_t 
+    +mux_adress_pins : vector<uint8_t> 
+    +min : uint16_t 
+    +max : uint16_t
 }
 
 'class
 class Pump {
     -String name
     -int CONTROLL_PIN
-    -Pump_Config cfg
+    -Cfg_Pump cfg
 
-    +Pump()
+    +Pump(Cfg_Pump cfg)
 
-    -{static?} water_interval_timer_callback() : void
-    -{static?} water_interval_timer_callback() : void
+    -{static} water_interval_timer_callback() : void
     +start_timer(uint64_t interval) : void
     +stop_timer() : void
     +delete_timer() : void

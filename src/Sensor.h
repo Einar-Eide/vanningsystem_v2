@@ -74,7 +74,7 @@ public:
     Sensor(String name, Sensor_Type type, uint8_t pin_in, uint16_t min=0, uint16_t max=4095);
 
     void init(MQTT_Handler* p_mqtt_handler);
-    void start_timer(int interval);
+    void start_timer(uint64_t interval);
     void stop_timer();
     void delete_timer();
 

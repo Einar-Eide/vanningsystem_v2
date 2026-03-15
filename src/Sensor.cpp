@@ -26,15 +26,15 @@ void Sensor::init(MQTT_Handler* p_mqtt_handler) {
 
     const esp_timer_create_args_t timer_args = {
         .callback = &Sensor::static_timer_callback,         // Static callback function
-            .arg = this,                                    // Optional argument passed to the callback
-        .name = name.c_str(),                  // Name for debugging
+        .arg = this,                                        // Optional argument passed to the callback
+        .name = name.c_str(),                               // Name for debugging
         .skip_unhandled_events = true                       // Optional setting for light sleep behavior
     };
 
     // Create the timer instance
     ESP_ERROR_CHECK(esp_timer_create(&timer_args, &timer_handle));
 
-    Serial.println(name + " timer started!");
+    Serial.println(name + " timer created!");
 }
 
 void Sensor::set_mux_adress_pins() {
@@ -44,7 +44,7 @@ void Sensor::set_mux_adress_pins() {
 }
 
 
-void Sensor::start_timer(int interval) {
+void Sensor::start_timer(uint64_t interval) {
     uint64_t interval_us = interval * 1000000;
     read_interval = interval_us;
     ESP_ERROR_CHECK(esp_timer_start_periodic(timer_handle, interval_us));

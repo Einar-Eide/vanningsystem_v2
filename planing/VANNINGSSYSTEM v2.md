@@ -16,6 +16,10 @@ Lager 3(?) kopier av dette systemet, et for hver gruppe
 (Eventuelt reguleringssystem for Eddie)
 
 
+### Kan eventuelt lage mux_controller klasse til sensorer og pumper? 
+
+
+
 ## Sensor
 
 ### Kamera
