@@ -3,7 +3,7 @@
 #include <Arduino.h>
 #include <esp_timer.h>
 #include <vector>
-#include "MQTT_Handler.h"
+#include "MQTT_Broadcaster.h"
 
 
 
@@ -35,7 +35,7 @@ protected:
     volatile int newest_raw_value;
     bool new_value;
 
-    MQTT_Handler* p_mqtt_client;
+    Mqtt_Broadcaster* p_mqtt_client;
     
     uint8_t INPUT_PIN;
     bool uses_mux_adress = false;
@@ -73,7 +73,7 @@ public:
     Sensor(Cfg_Sensor cfg);
     Sensor(String name, Sensor_Type type, uint8_t pin_in, uint16_t min=0, uint16_t max=4095);
 
-    void init(MQTT_Handler* p_mqtt_handler);
+    void init(Mqtt_Broadcaster* p_mqtt_broadcaster);
     void start_timer(uint64_t interval);
     void stop_timer();
     void delete_timer();

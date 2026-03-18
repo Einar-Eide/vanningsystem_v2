@@ -3,21 +3,31 @@
 #include <PubSubClient.h>
 
 #include ".secrets.h"
-#include "MQTT_Handler.h"
+#include "MQTT_Broadcaster.h"
 #include "humidity_sensor.h"
+#include "pump.h"
 
 // ====== WIFI SETTINGS ======
 const char* ssid = WIFI_SSID;
 const char* password = WIFI_PASSWORD;
 
 WiFiClient espClient;
-MQTT_Handler mqtt_client(espClient);
-MQTT_Handler* p_mqtt_client = &mqtt_client;
+Mqtt_Broadcaster mqtt_client(espClient);
+Mqtt_Broadcaster* p_mqtt_client = &mqtt_client;
 
 
 // ====== Sensors ======
 Humidity_Sensor h1("test", Sensor_Type::HUMIDITY_SENSOR, 32);
 
+Cfg_Pump cfg1 = {
+  "pump1",
+  0,
+  1000,
+  0,
+  GPIO_NUM_2,
+  "test/water"
+};
+Pump p1(cfg1);
 
 // ====== WiFi Connect ======
 void setup_wifi() {
@@ -50,14 +60,16 @@ void setup() {
   setup_wifi();
   p_mqtt_client->reconnect();
 
+  p1.init(p_mqtt_client);
+
   h1.init(p_mqtt_client);
-  h1.start_timer(5);
+  h1.start_timer(10);
 }
 
 void loop() {
   mqtt_client.update();
 
   h1.update();
-  delay(100);
+  delay(10);
 }
 

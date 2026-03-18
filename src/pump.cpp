@@ -1,8 +1,17 @@
 #include "pump.h"
 
-Pump::Pump(Cfg_Pump &cfg) : cfg(cfg) {
+Pump::Pump(Cfg_Pump cfg) : cfg(cfg) {
 
-    p_mqtt_client->add_subscribtion(cfg.MQTT_topic);
+    
+
+}
+
+void Pump::init(Mqtt_Broadcaster* p_mqtt_broadcaster) {
+
+    p_mqtt_client = p_mqtt_broadcaster;
+
+    p_mqtt_client->add_subscribtion(cfg.MQTT_start_watering_topic);
+    p_mqtt_client->add_subscriber(this);
 
     Serial.println("Creating timer for pump: " + cfg.name);
 
@@ -16,12 +25,21 @@ Pump::Pump(Cfg_Pump &cfg) : cfg(cfg) {
     // Create the timer instance
     ESP_ERROR_CHECK(esp_timer_create(&timer_args, &timer_handle));
 
+    // Activate Controllpin
+    pinMode(cfg.CONTROLL_PIN, OUTPUT);
+
     Serial.println(cfg.name + " timer created!");
 }
 
-void Pump::start_watering(uint64_t duration_ms) {
+void Pump::start_watering(uint64_t duration_ms = 0) {
+    if (duration_ms == 0) {
+        duration_ms = cfg.default_duration;
+    }
+
+    Serial.print("Started watering timer duration (ms): ");
+    Serial.println(duration_ms);
+    digitalWrite(cfg.CONTROLL_PIN, HIGH);
     start_timer(duration_ms);
-    digitalWrite(cfg.CONTROLL_PIN, 1);
 }
 
 void Pump::start_timer(uint64_t duration_ms) {
@@ -33,4 +51,24 @@ void Pump::stop_timer() {
 }
 void Pump::delete_timer() {
     ESP_ERROR_CHECK(esp_timer_delete(timer_handle));
+}
+
+void Pump::onMqttMessage(const String& topic, const String& msg) {
+
+    if (topic == cfg.MQTT_start_watering_topic) {
+        
+        int duration_ms = msg.toInt();
+        
+        // clean the message
+        if (duration_ms == 0 && msg != 0){
+            String cleanMsg = msg;
+            cleanMsg.remove(0, 1);
+            cleanMsg.remove(cleanMsg.length() - 1, 1);
+            cleanMsg.trim();  // removes whitespace like \n, \r, spaces
+
+            duration_ms = cleanMsg.toInt();
+        }
+        
+        start_watering( duration_ms );
+    } 
 }

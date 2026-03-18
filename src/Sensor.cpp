@@ -19,8 +19,8 @@ void Sensor::update(){
 }
 
 
-void Sensor::init(MQTT_Handler* p_mqtt_handler) {
-    p_mqtt_client = p_mqtt_handler;
+void Sensor::init(Mqtt_Broadcaster* p_mqtt_broadcaster) {
+    p_mqtt_client = p_mqtt_broadcaster;
 
     Serial.println("Creating timer for sensor: " + name);
 
