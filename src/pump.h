@@ -41,11 +41,12 @@ private:
 
         // turn off pump
         digitalWrite(instance->cfg.CONTROLL_PIN, 0);
+        digitalWrite(GPIO_NUM_2, LOW);
 
         // activate interupts again after data is read
         portENABLE_INTERRUPTS();
 
-        Serial.print(instance->cfg.name + " pump stoped watering.");
+        Serial.println(instance->cfg.name + " pump stoped watering.");
     };
 
 public:

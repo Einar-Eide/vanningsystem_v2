@@ -39,6 +39,7 @@ void Pump::start_watering(uint64_t duration_ms = 0) {
     Serial.print("Started watering timer duration (ms): ");
     Serial.println(duration_ms);
     digitalWrite(cfg.CONTROLL_PIN, HIGH);
+    digitalWrite(GPIO_NUM_2, HIGH);
     start_timer(duration_ms);
 }
 

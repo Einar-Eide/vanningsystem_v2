@@ -24,7 +24,7 @@ Cfg_Pump cfg1 = {
   0,
   1000,
   0,
-  GPIO_NUM_2,
+  GPIO_NUM_27,
   "test/water"
 };
 Pump p1(cfg1);
@@ -56,6 +56,8 @@ void setup_wifi() {
 
 
 void setup() {
+  pinMode(GPIO_NUM_2, OUTPUT);
+
   Serial.begin(115200);
   setup_wifi();
   p_mqtt_client->reconnect();
@@ -63,7 +65,7 @@ void setup() {
   p1.init(p_mqtt_client);
 
   h1.init(p_mqtt_client);
-  h1.start_timer(10);
+  h1.start_timer(1);
 }
 
 void loop() {

@@ -30,7 +30,7 @@ void Mqtt_Broadcaster::reconnect() {
       Serial.println("connected");
 
       // Subscribe
-      String topic = String(base_topic) + "/connection";
+      String topic = String(base_topic) + "connection";
       client.subscribe( topic.c_str() );
 
       // Publish initial message
@@ -65,7 +65,10 @@ void Mqtt_Broadcaster::broadcast(String topic, String& message) {
 }
 
 void Mqtt_Broadcaster::add_subscribtion(String topic) {
-  client.subscribe(topic.c_str()); // TODO: add base topic
+  //######################
+  // TODO: add base topic
+  //######################
+  client.subscribe(topic.c_str()); 
   Serial.print("Subscribed to new topic: ");
   Serial.printf(topic.c_str());
 }
