@@ -4,6 +4,7 @@
 #include <WiFi.h>
 #include <PubSubClient.h>
 #include <vector>
+#include <queue>
 #include <cstring> // Required for strlen()
 
 #include ".secrets.h"
@@ -22,6 +23,11 @@ class Mqtt_Broadcaster {
     PubSubClient client;
 
     std::vector<Mqtt_Listener*> listeners;
+    std::vector<String> subscribed_topics;
+    std::queue<std::pair<String, String>> internal_messages_brodcast_queue;
+    
+    std::queue<std::pair<String, String>> external_messages_publish_queue;
+    
 
 public:
     Mqtt_Broadcaster(WiFiClient& espClient);
@@ -29,9 +35,12 @@ public:
     void update();
     void reconnect();
 
+    void add_to_publish_queue(String& topic, String& message);
     void publish(String& topic, String& message);
+    void log(String message);
     
-    void broadcast(String topic, String& message);
+    void add_to_brodcast_queue(String& topic, String& message);
+    void broadcast(String& topic, String& message);
     void add_subscribtion(String topic);
     void add_subscriber(Mqtt_Listener* new_listener);
 

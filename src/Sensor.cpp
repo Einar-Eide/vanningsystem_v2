@@ -1,9 +1,22 @@
 #include "Sensor.h"
 
-Sensor::Sensor(Cfg_Sensor cfg) : 
+// sensor type to string map
+const std::map<Sensor_Type, String> SensorTypeMap = {
+    {Sensor_Type::HUMIDITY_SENSOR, "humidity"},
+    {Sensor_Type::THERMOMETER,     "thermometer"},
+    {Sensor_Type::LOAD_CELL,       "load_cell"},
+    {Sensor_Type::PHOTO_DIODE,     "photo_diode"},
+    {Sensor_Type::AIR_QUALITY,     "air_quality"}
+};
+
+
+
+
+Sensor::Sensor(const Cfg_Sensor &cfg) : 
     name(cfg.name), type(cfg.type), INPUT_PIN(cfg.pin_in), // basics
     uses_mux_adress(cfg.uses_mux_adress), mux_adress(cfg.mux_adress), mux_adress_pins(cfg.mux_adress_pins), // mux adressing
-    min_value(cfg.min), max_value(cfg.max) {} // min max values
+    min_value(cfg.min), max_value(cfg.max) // min max values
+    {}
 
 Sensor::Sensor(String name, Sensor_Type type, uint8_t pin_in, uint16_t min, uint16_t max) : 
     name(name), type(type), INPUT_PIN(pin_in), min_value(min), max_value(max) {}
@@ -12,8 +25,15 @@ void Sensor::update(){
 
     if ( new_value ) {
         String topic = name + "/value";
-        String message = "{\"value\":" + String(read()) + "}";
-        p_mqtt_client->publish(topic, message);
+
+        data_doc["value"] = read();
+
+        // create json
+        String jsonString;
+        serializeJson(data_doc, jsonString);
+
+        //String message = "{\"value\":" + String(read()) + ",\"type\":\"" + SensorTypeMap.at(type) + "\"}";
+        p_mqtt_client->publish(topic, jsonString);
         new_value = false;
     }
 }
@@ -35,6 +55,9 @@ void Sensor::init(Mqtt_Broadcaster* p_mqtt_broadcaster) {
     ESP_ERROR_CHECK(esp_timer_create(&timer_args, &timer_handle));
 
     Serial.println(name + " timer created!");
+
+    // add type to json
+    data_doc["type"] = SensorTypeMap.at(type);
 }
 
 void Sensor::set_mux_adress_pins() {

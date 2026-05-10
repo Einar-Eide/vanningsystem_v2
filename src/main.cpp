@@ -5,6 +5,7 @@
 #include ".secrets.h"
 #include "MQTT_Broadcaster.h"
 #include "humidity_sensor.h"
+#include "DS18B20_Thermometer.h"
 #include "pump.h"
 
 // ====== WIFI SETTINGS ======
@@ -19,22 +20,23 @@ Mqtt_Broadcaster* p_mqtt_client = &mqtt_client;
 // ====== Sensors ======
 Humidity_Sensor h1("test", Sensor_Type::HUMIDITY_SENSOR, 32);
 
+DS18B20_Thermometer t1("thermometer", GPIO_NUM_4, "bed_room");
+
+// ======  Pumps  ======
 Cfg_Pump cfg1 = {
   "pump1",
   0,
   1000,
   0,
   GPIO_NUM_27,
-  "test/water"
+  "wateringsystem/container1/fill"
 };
 Pump p1(cfg1);
 
 // ====== WiFi Connect ======
 void setup_wifi() {
   delay(10);
-  Serial.println();
-  Serial.print("Connecting to WiFi: ");
-  Serial.println(ssid);
+  g_p_Mqtt_Broadcaster->log("Connecting to WiFi: " + String(ssid));
 
   WiFi.begin(ssid, password);
 
@@ -43,14 +45,13 @@ void setup_wifi() {
     delay(500);
     Serial.print(".");
     waittime += 500;
-    if (waittime > 5000){
+    if (waittime > 2000){
+      g_p_Mqtt_Broadcaster->log("Failed to connect. Restarting...");
       ESP.restart();
     }
   }
-
-  Serial.println("\nWiFi connected");
-  Serial.print("IP address: ");
-  Serial.println(WiFi.localIP());
+  
+  g_p_Mqtt_Broadcaster->log("WiFi connected, IP adress:" + String(WiFi.localIP()));
 }
 
 
@@ -65,13 +66,21 @@ void setup() {
   p1.init(p_mqtt_client);
 
   h1.init(p_mqtt_client);
-  h1.start_timer(1);
+  h1.start_timer(10);
+
+  t1.init(p_mqtt_client);
+  t1.start_timer(5);
 }
 
 void loop() {
+  if (WiFi.status() != WL_CONNECTED) {
+    setup_wifi();
+  }
+
   mqtt_client.update();
 
   h1.update();
+  t1.update();
   delay(10);
 }
 

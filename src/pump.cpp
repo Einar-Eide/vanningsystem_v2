@@ -57,7 +57,7 @@ void Pump::delete_timer() {
 void Pump::onMqttMessage(const String& topic, const String& msg) {
 
     if (topic == cfg.MQTT_start_watering_topic) {
-        
+
         int duration_ms = msg.toInt();
         
         // clean the message

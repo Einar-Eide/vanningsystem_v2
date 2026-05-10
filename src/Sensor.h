@@ -3,6 +3,9 @@
 #include <Arduino.h>
 #include <esp_timer.h>
 #include <vector>
+#include <map>
+#include <ArduinoJson.h>
+
 #include "MQTT_Broadcaster.h"
 
 
@@ -11,18 +14,32 @@ enum class Sensor_Type {
     HUMIDITY_SENSOR, THERMOMETER, LOAD_CELL, PHOTO_DIODE, AIR_QUALITY
 };
 
+// Mapping the enum to string descriptions
+extern const std::map<Sensor_Type, String> SensorTypeMap;
+
+
+/**
+ * String name
+    Sensor_Type type
+    uint8_t pin_in
+    bool uses_mux_adress = false
+    uint8_t mux_adress
+    std::vector<uint8_t> mux_adress_pins
+    uint16_t min=0 
+    uint16_t max=4095
+ */
 struct Cfg_Sensor {
     String name;
     Sensor_Type type;
     uint8_t pin_in;
     bool uses_mux_adress = false;
-    uint8_t mux_adress;
+    uint8_t mux_adress = 0;
     std::vector<uint8_t> mux_adress_pins; // shared pointer??
     uint16_t min=0; 
     uint16_t max=4095;
 };
 
-
+// TODO: start using Cfg_Sensor within the class
 
 class Sensor {
 
@@ -32,7 +49,7 @@ protected:
 
     esp_timer_handle_t timer_handle;
 
-    volatile int newest_raw_value;
+    volatile float newest_raw_value;
     bool new_value;
 
     Mqtt_Broadcaster* p_mqtt_client;
@@ -45,6 +62,9 @@ protected:
     uint16_t min_value;
     uint16_t max_value;
     uint64_t read_interval;
+
+    JsonDocument data_doc;
+
 
     void set_mux_adress_pins();
 
@@ -59,18 +79,17 @@ protected:
             instance->set_mux_adress_pins();
         }
 
-        instance->newest_raw_value = analogRead(instance->INPUT_PIN);
-        instance->new_value = true;
+        instance->newest_raw_value = instance->read_raw();
+        instance->new_value = true; // TODO: add to MQTT_Broadcaster puplish queue instead of using a update function
 
         // activate interupts again after data is read
         portENABLE_INTERRUPTS();
 
-        Serial.print(instance->name + " sensor read new value: ");
-        Serial.println(instance->newest_raw_value);
+        g_p_Mqtt_Broadcaster->log(instance->name + " sensor read new value: " + instance->newest_raw_value);
     };
 
 public:
-    Sensor(Cfg_Sensor cfg);
+    Sensor(const Cfg_Sensor &cfg);
     Sensor(String name, Sensor_Type type, uint8_t pin_in, uint16_t min=0, uint16_t max=4095);
 
     void init(Mqtt_Broadcaster* p_mqtt_broadcaster);
@@ -79,7 +98,8 @@ public:
     void delete_timer();
 
     virtual float read() = 0;
-    int read_raw() { return newest_raw_value; }
+    virtual float read_raw() = 0;
+    float get_raw() { return newest_raw_value; }
 
     void update();
 

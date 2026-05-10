@@ -7,8 +7,12 @@ class Humidity_Sensor : public Sensor{
 public:
     using Sensor::Sensor;
 
+    float read_raw() override {
+        return analogRead(INPUT_PIN);
+    }
+
     float read() { 
-        float value = read_raw();
+        float value = get_raw();
         return value;
     }
 };

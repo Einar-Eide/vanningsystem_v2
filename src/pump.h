@@ -6,14 +6,14 @@
 
 #include "MQTT_Broadcaster.h"
 
-/*
-    String name;
-    uint64_t interval;
-    uint32_t default_duration;
-    uint32_t startup_delay;
-    uint8_t CONTROLL_PIN;
-    String MQTT_start_watering_topic;
-*/
+/**
+ * String name
+    uint64_t interval
+    uint32_t default_duration
+    uint32_t startup_delay
+    uint8_t CONTROLL_PIN
+    String MQTT_start_watering_topic
+ */
 struct Cfg_Pump {
     String name;
     uint64_t interval;
@@ -46,7 +46,8 @@ private:
         // activate interupts again after data is read
         portENABLE_INTERRUPTS();
 
-        Serial.println(instance->cfg.name + " pump stoped watering.");
+        // Serial.println(instance->cfg.name + " pump stoped watering.");
+        g_p_Mqtt_Broadcaster->log(instance->cfg.name + " pump stoped watering.");
     };
 
 public:
