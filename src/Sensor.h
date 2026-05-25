@@ -47,6 +47,8 @@ protected:
     String name;
     Sensor_Type type;
 
+    bool is_online_bool = false;
+
     esp_timer_handle_t timer_handle;
 
     volatile float newest_raw_value;
@@ -81,6 +83,7 @@ protected:
 
         instance->newest_raw_value = instance->read_raw();
         instance->new_value = true; // TODO: add to MQTT_Broadcaster puplish queue instead of using a update function
+        instance->is_online_bool = true;
 
         // activate interupts again after data is read
         portENABLE_INTERRUPTS();
@@ -107,5 +110,7 @@ public:
     Sensor_Type get_type()  { return type; }
     int get_pin()           { return INPUT_PIN; }
     int get_read_interval() { return read_interval; }
+
+    bool is_online()        { return is_online_bool; }
 
 };

@@ -5,6 +5,7 @@
 #include <String>
 
 #include "MQTT_Broadcaster.h"
+class Emergancy_handler;
 
 /**
  * String name
@@ -31,6 +32,8 @@ private:
 
     Mqtt_Broadcaster* p_mqtt_client;
 
+    bool stoped = false;
+
     void onMqttMessage(const String& topic, const String& msg) override;
 
     static void static_water_duration_timer_callback(void* arg) {
@@ -53,12 +56,14 @@ private:
 public:
     Pump(Cfg_Pump cfg);
 
-    void init(Mqtt_Broadcaster* p_mqtt_broadcaster);
+    void init(Mqtt_Broadcaster* p_mqtt_broadcaster, Emergancy_handler* p_emergancy_handler);
 
     void start_watering(uint64_t duration_ms);
     void start_timer(uint64_t duration_ms);
     void stop_timer();
     void delete_timer();
+
+    void emergency_stop();
     
     // void update_config();
 };

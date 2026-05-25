@@ -1,17 +1,18 @@
 #include "pump.h"
+#include "emergancy.h"
 
 Pump::Pump(Cfg_Pump cfg) : cfg(cfg) {
 
-    
-
 }
 
-void Pump::init(Mqtt_Broadcaster* p_mqtt_broadcaster) {
+void Pump::init(Mqtt_Broadcaster* p_mqtt_broadcaster, Emergancy_handler* p_emergancy_handler) {
 
     p_mqtt_client = p_mqtt_broadcaster;
 
     p_mqtt_client->add_subscribtion(cfg.MQTT_start_watering_topic);
     p_mqtt_client->add_subscriber(this);
+
+    p_emergancy_handler->addPump(this);
 
     Serial.println("Creating timer for pump: " + cfg.name);
 
@@ -35,12 +36,14 @@ void Pump::start_watering(uint64_t duration_ms = 0) {
     if (duration_ms == 0) {
         duration_ms = cfg.default_duration;
     }
-
-    Serial.print("Started watering timer duration (ms): ");
-    Serial.println(duration_ms);
-    digitalWrite(cfg.CONTROLL_PIN, HIGH);
-    digitalWrite(GPIO_NUM_2, HIGH);
-    start_timer(duration_ms);
+    
+    if (!g_emergancy_stoped) {
+        Serial.print("Started watering timer duration (ms): ");
+        Serial.println(duration_ms);
+        digitalWrite(cfg.CONTROLL_PIN, HIGH);
+        digitalWrite(GPIO_NUM_2, HIGH);
+        start_timer(duration_ms);
+    }
 }
 
 void Pump::start_timer(uint64_t duration_ms) {
@@ -72,4 +75,8 @@ void Pump::onMqttMessage(const String& topic, const String& msg) {
         
         start_watering( duration_ms );
     } 
+}
+
+void Pump::emergency_stop() {
+    digitalWrite(cfg.CONTROLL_PIN, LOW);
 }
